@@ -9,6 +9,8 @@ import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -223,6 +225,24 @@ public class InfoActorActivity extends AppCompatActivity {
         i.putParcelableArrayListExtra(LISTA_PELICULAS,filmografia.getPeliculas());
         startActivity(i);
     }
+
+    //Prueba de un menu
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu,menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if(item.getItemId()==R.id.nuevaBusqueda){
+            Intent i = new Intent(this,MainActivity.class);
+            startActivity(i);
+        }
+
+        return true;
+    }
+
 
 
 }
