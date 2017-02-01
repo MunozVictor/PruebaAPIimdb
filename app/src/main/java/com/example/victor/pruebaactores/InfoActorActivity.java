@@ -9,7 +9,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,17 +18,22 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.util.ArrayList;
 
 public class InfoActorActivity extends AppCompatActivity {
+    public static final String LISTA_PELICULAS = "LISTA_PELICULAS";
     // key : 869d9232-de37-4b73-9c8e-312ed5edfe44
+
+    //http://imdb.wemakesites.net/api/nm0000314?api_key=869d9232-de37-4b73-9c8e-312ed5edfe44
     String key ="869d9232-de37-4b73-9c8e-312ed5edfe44";
-    String forecastURL ;
+    String filmografiaURL ;
     String TAG = "INFOACTOR:";
-    Forecast forecast;
+    Filmografia filmografia;
     TextView tvNombreActor , tvBiografia;
     Button btnFilmografia;
 
@@ -42,22 +46,19 @@ public class InfoActorActivity extends AppCompatActivity {
 
         String codigo = i.getStringExtra(MainActivity.CODIGO_ELEGIDO);
 
-        forecastURL ="http://imdb.wemakesites.net/api/"+codigo+"?api_key="+key;
+        filmografiaURL ="http://imdb.wemakesites.net/api/"+codigo+"?api_key="+key;
         tvBiografia = (TextView) findViewById(R.id.tvBiografia);
         tvNombreActor = (TextView) findViewById(R.id.tvNombreActor);
         btnFilmografia = (Button) findViewById(R.id.btnFilmografia);
+        //btnFilmografia.setVisibility(View.INVISIBLE);
 
-        obtenerForecast();
-
-
-
-
+        obtenerfilmografia();
     }
 
-    private void obtenerForecast() {
+    private void obtenerfilmografia() {
        if(isNetworkAvailable()){
            OkHttpClient client = new OkHttpClient();//se importa la libreria que hemos añadido en el gradle moduleapp
-           Request request = new Request.Builder().url(forecastURL).build();
+           Request request = new Request.Builder().url(filmografiaURL).build();
            //se crea la consulta a la que pasamos la url
            Call call = client.newCall(request);
            call.enqueue(new Callback() {
@@ -89,12 +90,27 @@ public class InfoActorActivity extends AppCompatActivity {
                        //Response response = call.execute();//este proceso debe esperar a que el layout se carga por lo que hay que ponerlo en cola
                        String jsonData=response.body().string();//solo se puede hacer un response
                        Log.v(TAG, jsonData);//devuelve los daros del archivo json con los datos del api que estamos usando
-                       if (response.isSuccessful()) {
-                           forecast = crearForecast(jsonData);
-                           cargarDatos();
-                       } else {
-                           //SALTARA CUANDO HAYA UN NOT FOUND
-                           alertUserAboutError();
+
+                       if(statusOk(jsonData)){
+
+                           if (response.isSuccessful()) {
+                               filmografia = crearfilmografia(jsonData);
+                               cargarDatos();
+
+                           } else {
+                               //SALTARA CUANDO HAYA UN NOT FOUND
+                               alertUserAboutError();
+                           }
+
+                       }else{
+                           runOnUiThread(new Runnable() {
+                               @Override
+                               public void run() {
+                                   tvBiografia.setText("Codigo no correcto");
+
+                               }
+                           });
+
                        }
                    } catch (IOException e) {
                        Log.e(TAG, "Excepcion: Entrada / Salida", e);
@@ -111,42 +127,66 @@ public class InfoActorActivity extends AppCompatActivity {
 
     }
 
+    private boolean statusOk(String jsonData) throws JSONException {
+        boolean statusOk = false;
+        JSONObject filmografia = new JSONObject(jsonData);
+        String stat = filmografia.getString("status");
+        if(stat.equals("success")){
+            statusOk = true;
+        }
+        return statusOk;
+    }
+
     private void cargarDatos() {
         runOnUiThread(new Runnable() {
 
             @Override
             public void run() {
-                tvNombreActor.setText(forecast.getNombreActor());
-                tvBiografia.setText(forecast.getBiografia());
+                //btnFilmografia.setVisibility(View.VISIBLE);
+                tvNombreActor.setText(filmografia.getNombreActor());
+                tvBiografia.setText(filmografia.getBiografia());
             }
         });
     }
 
-    private Forecast crearForecast(String jsonData) throws JSONException {
-        forecast = new Forecast();
-        forecast.setNombreActor(getNombreActor(jsonData));
-        forecast.setBiografia(getBiografia(jsonData));
-        forecast.setPeliculas(getPeliculas(jsonData));
-        return forecast;
+    private Filmografia crearfilmografia(String jsonData) throws JSONException {
+        filmografia = new Filmografia();
+        filmografia.setNombreActor(getNombreActor(jsonData));
+        filmografia.setBiografia(getBiografia(jsonData));
+        filmografia.setPeliculas(getPeliculas(jsonData));
+        return filmografia;
     }
 
-    private Pelicula[] getPeliculas(String jsonData) {
-        //// TODO: 31/01/2017
-        return null;
+    private ArrayList<Pelicula> getPeliculas(String jsonData) throws JSONException {
+        JSONObject filmografia = new JSONObject(jsonData);
+        JSONObject data = filmografia.getJSONObject("data");
+        JSONArray filmography = data.getJSONArray("filmography");
+        //Pelicula [] peliculas = new Pelicula[filmografia.length()];
+        JSONObject peliJSON;
+        ArrayList<Pelicula>peliculas= new ArrayList<>();
+        Pelicula peli;
+        for(int i = 0; i<filmografia.length();i++){
+            peliJSON = filmography.getJSONObject(i);
+            peli = new Pelicula();
+            peli.setTitulo(peliJSON.getString("title"));
+            peli.setAnio(peliJSON.getString("year"));
+            peliculas.add(peli);
+        }
+        return peliculas;
     }
 
     private String getBiografia(String jsonData) throws JSONException {
-        JSONObject forecast = new JSONObject(jsonData);
-        JSONObject data = forecast.getJSONObject("data");
+        JSONObject filmografia = new JSONObject(jsonData);
+        JSONObject data = filmografia.getJSONObject("data");
         String bio = data.getString("description");
         return bio;
     }
 
     private String getNombreActor(String jsonData) throws JSONException {
-        JSONObject forecast = new JSONObject(jsonData);
-        JSONObject data = forecast.getJSONObject("data");
-        String bio = data.getString("title");
-        return bio;
+        JSONObject filmografia = new JSONObject(jsonData);
+        JSONObject data = filmografia.getJSONObject("data");
+        String nombre = data.getString("title");
+        return nombre;
     }
     private boolean isNetworkAvailable() {
         ConnectivityManager manager = (ConnectivityManager)
@@ -161,6 +201,11 @@ public class InfoActorActivity extends AppCompatActivity {
     private void alertUserAboutError() {
         AlertDialogFragment dialog = new AlertDialogFragment();
         dialog.show(getFragmentManager(), "Error dialog:");
+    }
+    public void verFilmografia(View v){
+        Intent i = new Intent(this,FilmografiaActivity.class);
+        i.putExtra(LISTA_PELICULAS,filmografia.getPeliculas());
+        startActivity(i);
     }
 
 

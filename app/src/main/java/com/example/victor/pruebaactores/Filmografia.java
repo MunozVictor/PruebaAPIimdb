@@ -1,13 +1,15 @@
 package com.example.victor.pruebaactores;
 
+import java.util.ArrayList;
+
 /**
  * Created by Victor on 31/01/2017.
  */
 
-public class Forecast {
+public class Filmografia {
     String nombreActor;
     String biografia;
-    Pelicula [] peliculas;
+    ArrayList <Pelicula> peliculas;
 
     public String getNombreActor() {
         return nombreActor;
@@ -25,11 +27,11 @@ public class Forecast {
         this.biografia = biografia;
     }
 
-    public Pelicula[] getPeliculas() {
+    public ArrayList<Pelicula> getPeliculas() {
         return peliculas;
     }
 
-    public void setPeliculas(Pelicula[] peliculas) {
+    public void setPeliculas(ArrayList<Pelicula> peliculas) {
         this.peliculas = peliculas;
     }
 }

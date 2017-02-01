@@ -15,9 +15,11 @@
         android:layout_height="wrap_content"
         android:id="@+id/tvNombreActor"
         android:layout_alignParentTop="true"
-        android:textSize="35sp"
+        android:textSize="20sp"
         android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true" />
+        android:layout_alignParentStart="true"
+        android:layout_alignRight="@+id/tvBiografia"
+        android:layout_alignEnd="@+id/tvBiografia" />
 
     <TextView
         android:layout_width="wrap_content"
@@ -29,7 +31,8 @@
         android:layout_marginTop="10dp"
         android:id="@+id/tvBiografia"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_above="@+id/btnFilmografia" />
 
     <Button
         android:text="VER FILMOGRAFIA"
@@ -37,7 +40,10 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:id="@+id/btnFilmografia"
-        android:layout_toRightOf="@+id/tvNombreActor"
+        android:layout_marginBottom="1dp"
         android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true" />
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentLeft="true"
+        android:onClick="verFilmografia"
+        android:layout_alignParentStart="true" />
 </RelativeLayout>
