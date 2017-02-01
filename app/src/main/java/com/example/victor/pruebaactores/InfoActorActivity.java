@@ -4,6 +4,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -50,9 +52,15 @@ public class InfoActorActivity extends AppCompatActivity {
         tvBiografia = (TextView) findViewById(R.id.tvBiografia);
         tvNombreActor = (TextView) findViewById(R.id.tvNombreActor);
         btnFilmografia = (Button) findViewById(R.id.btnFilmografia);
-        //btnFilmografia.setVisibility(View.INVISIBLE);
+        btnFilmografia.setVisibility(View.INVISIBLE);
 
         obtenerfilmografia();
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.JELLY_BEAN)
+    @Override
+    public void onBackPressed() {
+        finishAffinity();//para probar este metodo , termina apliacion en la pantalla del actor
     }
 
     private void obtenerfilmografia() {
@@ -142,7 +150,7 @@ public class InfoActorActivity extends AppCompatActivity {
 
             @Override
             public void run() {
-                //btnFilmografia.setVisibility(View.VISIBLE);
+                btnFilmografia.setVisibility(View.VISIBLE);
                 tvNombreActor.setText(filmografia.getNombreActor());
                 tvBiografia.setText(filmografia.getBiografia());
             }
@@ -159,13 +167,17 @@ public class InfoActorActivity extends AppCompatActivity {
 
     private ArrayList<Pelicula> getPeliculas(String jsonData) throws JSONException {
         JSONObject filmografia = new JSONObject(jsonData);
+        Log.i(TAG,"filmografia : "+filmografia);
         JSONObject data = filmografia.getJSONObject("data");
+        Log.i(TAG,"data : "+data);
+
         JSONArray filmography = data.getJSONArray("filmography");
+        Log.i(TAG,"filmography : "+filmography);
         //Pelicula [] peliculas = new Pelicula[filmografia.length()];
         JSONObject peliJSON;
         ArrayList<Pelicula>peliculas= new ArrayList<>();
         Pelicula peli;
-        for(int i = 0; i<filmografia.length();i++){
+        for(int i = 0; i<filmography.length();i++){
             peliJSON = filmography.getJSONObject(i);
             peli = new Pelicula();
             peli.setTitulo(peliJSON.getString("title"));
@@ -204,7 +216,11 @@ public class InfoActorActivity extends AppCompatActivity {
     }
     public void verFilmografia(View v){
         Intent i = new Intent(this,FilmografiaActivity.class);
-        i.putExtra(LISTA_PELICULAS,filmografia.getPeliculas());
+        for (int t =0;t<filmografia.getPeliculas().size();t++){
+            Log.i(TAG,"PELICULA : "+filmografia.getPeliculas());
+
+        }
+        i.putParcelableArrayListExtra(LISTA_PELICULAS,filmografia.getPeliculas());
         startActivity(i);
     }
 

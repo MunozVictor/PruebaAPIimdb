@@ -12,7 +12,7 @@ import java.util.ArrayList;
 
 public class FilmografiaActivity extends AppCompatActivity {
     ListView listView;
-    ArrayList<Pelicula>peliculas;
+    ArrayList<Pelicula>peliculas = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -22,7 +22,7 @@ public class FilmografiaActivity extends AppCompatActivity {
         listView = (ListView) findViewById(R.id.listView);
 
         Intent i = getIntent();
-        ArrayList<Pelicula> peliculas = i.getParcelableArrayListExtra(InfoActorActivity.LISTA_PELICULAS);
+        peliculas = i.getParcelableArrayListExtra(InfoActorActivity.LISTA_PELICULAS);
         PeliculasAdapter adapter = new PeliculasAdapter(this,peliculas);
         listView.setAdapter(adapter);
 

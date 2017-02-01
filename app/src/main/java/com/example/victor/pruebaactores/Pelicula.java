@@ -11,6 +11,7 @@ public class Pelicula implements Parcelable{
     String titulo;
     String anio;
 
+
     public static final Creator<Pelicula> CREATOR = new Creator<Pelicula>() {
         @Override
         public Pelicula createFromParcel(Parcel in) {

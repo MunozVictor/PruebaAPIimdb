@@ -14,8 +14,8 @@ import java.util.ArrayList;
  */
 public class PeliculasAdapter extends BaseAdapter{
 
-    ArrayList<Pelicula> peliculas;
-    Context contexto;
+    private ArrayList<Pelicula> peliculas = new ArrayList<>();
+    private Context contexto;
 
     public PeliculasAdapter(Context contexto , ArrayList<Pelicula> peliculas) {
         this.peliculas = peliculas;
